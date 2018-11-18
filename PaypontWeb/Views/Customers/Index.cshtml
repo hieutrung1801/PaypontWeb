@@ -1,0 +1,51 @@
+﻿<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<h2>Index</h2>
+
+<form>
+    <div class="form-group">
+        Surname: <br>
+            <input id="surName" type="text" name="surName">
+        <input type="button" value="Find" onclick="getCustomerBySurName()" 
+               class="btn btn-primary"/>
+    </div>
+</form>
+<table id="records_table"  style="width:100%">
+    <thead>
+    <tr>
+        <th>First Name</th>
+        <th>Sur Name</th>
+        <th>Address</th>
+        <th>City</th>
+        <th>Postcode</th>
+    </tr>
+    </thead>
+    <tbody>
+
+    </tbody>
+</table>
+<script>
+    var serviceUrl = 'https://paypontapi.azurewebsites.net/api/customer';
+    var surName = $('#surName').val();
+        function getCustomerBySurName() {
+            $.ajax({
+                type: 'GET',
+                url: serviceUrl + "/" + surName
+            }).done(function (data) {
+                $('#data').text(data);
+                $(function() {
+                    $.each(data, function (i, customer) {
+                        var tr = $('<tr>').append(
+                            $('<td>').text(customer.firstName),
+                            $('<td>').text(customer.surName),
+                            $('<td>').text(customer.streetAddress),
+                            $('<td>').text(customer.city),
+                            $('<td>').text(customer.postcode)
+                        );
+                        $("#records_table tbody").append(tr);
+                    });
+                });
+            }).fail(function () {
+                alert('Failed to send request!');
+            });
+        }
+</script>
