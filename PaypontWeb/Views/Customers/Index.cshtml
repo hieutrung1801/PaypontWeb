@@ -4,10 +4,11 @@
 <form>
     <div class="form-group">
         Surname: <br>
-            <input id="surName" type="text" name="surName">
+        <input id="surName" type="text" name="surName">
         <input type="button" value="Find" onclick="getCustomerBySurName()" 
                class="btn btn-primary"/>
     </div>
+    <div>(Leave blank for list of all customer)</div>
 </form>
 <table id="records_table"  style="width:100%">
     <thead>
@@ -25,8 +26,10 @@
 </table>
 <script>
     var serviceUrl = 'https://paypontapi.azurewebsites.net/api/customer';
-    var surName = $('#surName').val();
         function getCustomerBySurName() {
+            var surName = $('#surName').val();
+            $("#records_table tbody").empty();
+
             $.ajax({
                 type: 'GET',
                 url: serviceUrl + "/" + surName
