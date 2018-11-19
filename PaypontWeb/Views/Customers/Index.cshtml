@@ -1,15 +1,21 @@
-﻿<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-<h2>Index</h2>
+﻿@* Adding jquery script *@
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+<h2>Find customer</h2>
 
 <form>
+    @* Input field for customer's surname *@
     <div class="form-group">
         Surname: <br>
         <input id="surName" type="text" name="surName">
-        <input type="button" value="Find" onclick="getCustomerBySurName()" 
+        <input type="button" value="Find" onclick="getCustomerBySurName()"
                class="btn btn-primary"/>
     </div>
     <div>(Leave blank for list of all customer)</div>
 </form>
+
+@* Table for results. Initially the body of the table will be empty.
+    It will be updated with the result*@
 <table id="records_table"  style="width:100%">
     <thead>
     <tr>
@@ -25,33 +31,49 @@
     </tbody>
 </table>
 <script>
+    // Default API link
     var serviceUrl = 'https://paypontapi.azurewebsites.net/api/customer';
-        function getCustomerBySurName() {
-            var surName = $('#surName').val();
-            $("#records_table tbody").empty();
 
-            $.ajax({
-                type: 'GET',
-                url: serviceUrl + "/" + surName
-            }).done(function (data) {
-                $('#data').text(data);
-                $(function() {
-                    $.each(data, function (i, customer) {
-                        var tr = $('<tr>').append(
-                            $('<td>').text(customer.firstName),
-                            $('<td>').text(customer.surName),
-                            $('<td>').text(customer.streetAddress),
-                            $('<td>').text(customer.city),
-                            $('<td>').text(customer.postcode)
-                        );
-                        $("#records_table tbody").append(tr);
-                    });
+
+    function getCustomerBySurName() {
+    
+        // Get the surname as string
+        var surName = $('#surName').val();
+
+        // Emptying the table body before adding new results, otherwise it will append to the 
+        // old result. Blank surname will return a list of all customers
+        $("#records_table tbody").empty();
+
+        //Ajax get request
+        $.ajax({
+            type: 'GET',
+            url: serviceUrl + "/" + surName
+        }).done(function (data) {
+            $('#data').text(data);
+
+            // For each customer, create a new row to display their information
+            $(function() {
+                $.each(data, function (i, customer) {
+                    var tr = $('<tr>').append(
+                        $('<td>').text(customer.firstName),
+                        $('<td>').text(customer.surName),
+                        $('<td>').text(customer.streetAddress),
+                        $('<td>').text(customer.city),
+                        $('<td>').text(customer.postcode)
+                    );
+                    // Append to the table
+                    $("#records_table tbody").append(tr);
+
                 });
-            }).fail(function () {
-                alert('Failed to send request!');
             });
-        }
+        }).fail(function (xhr, status, error) {
+            // If the request fail, display a pop up with the error message
+            var errorMessage = xhr.status + ': ' + xhr.statusText;
+            alert('Error - ' + errorMessage);
+        });
+    }
 
+    //Function to sort table by first name or surname. This is copied from w3schools website.
     function sortTable(n) {
         var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
         table = document.getElementById("records_table");
